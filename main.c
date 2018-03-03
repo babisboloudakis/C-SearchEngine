@@ -35,7 +35,7 @@ for ( int currentLine = 0; currentLine < maxLines; currentLine++ ) {
 
 
 
-//Deallocs
+//De-allocs
 for( int currentLine = 0; currentLine < maxLines; currentLine++) { 
 	free(textMap[currentLine]);
 }
