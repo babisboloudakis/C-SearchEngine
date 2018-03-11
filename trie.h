@@ -1,6 +1,6 @@
 #include "list.h"
 
-struct Node { 
+typedef struct TrieNode { 
     char c;
     List children;
 }
