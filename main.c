@@ -41,9 +41,11 @@ void userLoop() { // User interface for commands on search engine
 			char * word, * cparam;
 			printf("getting in\n");
 			for ( int j = 0; j < paramCount; j++ ) {
+
 				cparam = params[j];
 				printf("j is %d \n", j);
 				for ( int i = 0; i < maxLines; i++ ) {
+
 					printf("i is %d \n" , i);
 					word = strtok(textMap[i], DELIMS);
 					if ( strcmp(word,cparam) == 0 ) {
@@ -54,7 +56,9 @@ void userLoop() { // User interface for commands on search engine
 							printf("FOUND %s\n", cparam);
 						}
 					}
+
 				}
+				
 			}
 
 
