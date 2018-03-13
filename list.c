@@ -1,6 +1,5 @@
 #include "list.h"
-#include <stdio.h>
-#include <stdlib.h>
+
 
 void ListCreate(List ** list) {
     // Used to properly initialize a List
@@ -120,35 +119,35 @@ ListNode * ListGet( List * list, int index ) {
     return currentNode;
 }
 
-int main ( void ) {
+// int main ( void ) {
 
-    List * list;
-    ListNode * listNode;
-    ListCreate(&list);
+//     List * list;
+//     ListNode * listNode;
+//     ListCreate(&list);
 
-    ListInsert(list,'a');
-    ListInsert(list,'e');
-    ListInsert(list,'b');
-    ListInsert(list,'c');
-    ListInsert(list,'z');
-    ListInsert(list,'f');
-    ListInsert(list,'y');
-    ListInsert(list,'a');
-    ListInsert(list,'z');
-    ListInsert(list,'d');
+//     ListInsert(list,'a');
+//     ListInsert(list,'e');
+//     ListInsert(list,'b');
+//     ListInsert(list,'c');
+//     ListInsert(list,'z');
+//     ListInsert(list,'f');
+//     ListInsert(list,'y');
+//     ListInsert(list,'a');
+//     ListInsert(list,'z');
+//     ListInsert(list,'d');
 
-    listNode = ListGet(list,5);
-    printf("LIST NODE value %c\n", listNode->data);
-    printf("Searching for \'z\'....\n");
-    printf("Found in position %d\n", ListSearch(list,'z'));
+//     listNode = ListGet(list,5);
+//     printf("LIST NODE value %c\n", listNode->data);
+//     printf("Searching for \'z\'....\n");
+//     printf("Found in position %d\n", ListSearch(list,'z'));
 
-    printf("Searching for \'a\'....\n");
-    printf("Found in position %d\n", ListSearch(list,'a'));
-
-
-    ListPrint(list);
-
-    ListDestroy(list);
+//     printf("Searching for \'a\'....\n");
+//     printf("Found in position %d\n", ListSearch(list,'a'));
 
 
-}
+//     ListPrint(list);
+
+//     ListDestroy(list);
+
+
+// }

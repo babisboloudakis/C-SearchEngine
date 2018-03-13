@@ -15,6 +15,8 @@ typedef struct Trie {
 // Functions on Trie
 int TrieCreate(Trie **);
 int TrieDestroy(Trie *);
-int TrieInsert();
-TrieNode * TrieSearch();
-void TriePrint();
+void TrieHatch(List *);
+
+int TrieInsert(Trie *, char *);
+void TrieSearchWord(Trie *, char *);
+void TriePrint(List *);
