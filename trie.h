@@ -17,6 +17,6 @@ int TrieCreate(Trie **);
 int TrieDestroy(Trie *);
 void TrieHatch(List *);
 
-int TrieInsert(Trie *, char *);
-void TrieSearchWord(Trie *, char *);
+int TrieInsert(Trie *, char *, int);
+ListNode * TrieSearchWord(Trie *, char *);
 void TriePrint(List *);

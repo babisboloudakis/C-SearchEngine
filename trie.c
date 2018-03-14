@@ -26,7 +26,7 @@ void TrieHatch( List * list ) {
     ListDestroy( list );
 }
 
-int TrieInsert( Trie * trie, char * word ) {
+int TrieInsert( Trie * trie, char * word, int d ) {
 
     List * currentList = trie->children;
     // ListNode * currentNode = NULL;
@@ -41,6 +41,16 @@ int TrieInsert( Trie * trie, char * word ) {
         }
         currentList = ListGet(currentList, ListSearch(currentList,letter))->children;
     }
+
+    ListNode * node = TrieSearchWord(trie,word);
+            printf("asasas %p\n\n", node->isFinal);
+
+    if ( node->isFinal == NULL ) {
+        printf("creating...\n");
+        PlCreate(&(node->isFinal));
+    }
+    PlInsert(node->isFinal,d);
+    PlPrint(node->isFinal);
     return 0;
 
 } 
@@ -52,10 +62,9 @@ void TriePrint ( List * list ) {
     }
 }
 
-void TrieSearchWord ( Trie * trie , char * word ) {
+ListNode * TrieSearchWord ( Trie * trie , char * word ) {
 
     List * currentList = trie->children;
-    // ListNode * currentNode = NULL;
 
     char letter;
     int length = strlen(word);
@@ -64,13 +73,18 @@ void TrieSearchWord ( Trie * trie , char * word ) {
         letter = word[i];
         if ( ListSearch(currentList,letter) == -1 ) {
             printf("WORD NOT FOUND\n");
-            return;
+            return NULL;
         }
         printf("found %c\n", letter);
+        if ( i == length - 1 ) break;
+        printf("DONT SHOW ME\n");
         currentList = ListGet(currentList, ListSearch(currentList,letter))->children;
     }
+    ListNode * node = ListGet(currentList, ListSearch(currentList,letter));
     printf("FOUND WORD %s\n" , word );
-    return ;
+    printf("letter %p \n\n", node);
+    return node;
+
 }
 
 int main ( void ) {
@@ -87,18 +101,24 @@ int main ( void ) {
     char word7[] = "race";
     char word8[] = "grace";
 
-    TrieInsert(trie,word1);
-    TrieInsert(trie,word2);
-    TrieInsert(trie,word3);
-    TrieInsert(trie,word8);
-    TrieInsert(trie,word5);
-    TrieInsert(trie,word6);
+    TrieInsert(trie,word1,0);
+    TrieInsert(trie,word1,2);
+    TrieInsert(trie,word1,0);
+    TrieInsert(trie,word1,1);
+    TrieInsert(trie,word1,0);
+    TrieInsert(trie,word1,3);
+    TrieInsert(trie,word2,0);
+    TrieInsert(trie,word2,3);
+    TrieInsert(trie,word2,3);
+    TrieInsert(trie,word2,3);
 
-    TriePrint(trie->children);
 
-    TrieSearchWord(trie, word3);
-    TrieSearchWord(trie, word4);
-    TrieSearchWord(trie, word7);
 
-    TrieDestroy(trie);
+    // TriePrint(trie->children);
+
+    // TrieSearchWord(trie, word3);
+    // TrieSearchWord(trie, word4);
+    // TrieSearchWord(trie, word8);
+
+    // TrieDestroy(trie);
 }

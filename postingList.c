@@ -1,6 +1,5 @@
 #include "postingList.h"
-#include <stdio.h>
-#include <stdlib.h>
+
 
 
 void PlCreate( PostingList ** postingList ) {
@@ -76,30 +75,31 @@ void PlPrint( PostingList * postingList ) {
 
 }
 
-int main ( void ) { 
 
-    PostingList * postingList;
+// int main ( void ) { 
 
-    PlCreate(&postingList);
+//     PostingList * postingList;
 
-    PlInsert(postingList, 0);
-    PlInsert(postingList, 0);
-    PlInsert(postingList, 1);
-    PlInsert(postingList, 2);
-    PlInsert(postingList, 2);
-    PlInsert(postingList, 2);
-    PlInsert(postingList, 2);
-    PlInsert(postingList, 3);
-    PlInsert(postingList, 5);
-    PlInsert(postingList, 20);
-    PlInsert(postingList, 20);
-    PlInsert(postingList, 20);
+//     PlCreate(&postingList);
 
-    PlPrint(postingList);
+//     PlInsert(postingList, 0);
+//     PlInsert(postingList, 0);
+//     PlInsert(postingList, 1);
+//     PlInsert(postingList, 2);
+//     PlInsert(postingList, 2);
+//     PlInsert(postingList, 2);
+//     PlInsert(postingList, 2);
+//     PlInsert(postingList, 3);
+//     PlInsert(postingList, 5);
+//     PlInsert(postingList, 20);
+//     PlInsert(postingList, 20);
+//     PlInsert(postingList, 20);
 
-
-    PlDestroy(postingList);
+//     PlPrint(postingList);
 
 
+//     PlDestroy(postingList);
 
-}
+
+
+// }

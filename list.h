@@ -1,16 +1,14 @@
 // Linked list data structure
 // used to store children of a node
 // in a Trie date structure
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "postingList.h"
 
 typedef struct List List;
 
 typedef struct ListNode {
     struct ListNode * next;
     char data; 
-    void * isFinal;
+    PostingList * isFinal;
     List * children;
 } ListNode;
 
