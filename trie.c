@@ -43,11 +43,9 @@ int TrieInsert( Trie * trie, char * word, int d ) {
     }
 
     ListNode * node = TrieSearchWord(trie,word);
-            printf("asasas %p\n\n", node->isFinal);
 
     if ( node->isFinal == NULL ) {
-        printf("creating...\n");
-        PlCreate(&(node->isFinal));
+        PlCreate(&(node->isFinal), word);
     }
     PlInsert(node->isFinal,d);
     PlPrint(node->isFinal);
@@ -72,20 +70,36 @@ ListNode * TrieSearchWord ( Trie * trie , char * word ) {
     for ( int i = 0; i < length; i++ ) {
         letter = word[i];
         if ( ListSearch(currentList,letter) == -1 ) {
-            printf("WORD NOT FOUND\n");
             return NULL;
         }
-        printf("found %c\n", letter);
         if ( i == length - 1 ) break;
-        printf("DONT SHOW ME\n");
         currentList = ListGet(currentList, ListSearch(currentList,letter))->children;
     }
     ListNode * node = ListGet(currentList, ListSearch(currentList,letter));
-    printf("FOUND WORD %s\n" , word );
-    printf("letter %p \n\n", node);
     return node;
 
 }
+
+int TrieTf(Trie * trie, char * word, int id ) {
+
+    ListNode * node = TrieSearchWord(trie,word);
+    Posting * posting = PlSearch(node->isFinal, id);
+    return posting->count;
+
+}
+
+void TrieDf( List * list ) {
+    ListNode * listNode;
+    for ( int i = 0; i < list->length; i++ ) {
+        
+        listNode = ListGet(list,i);
+        if ( listNode->isFinal != NULL ) {
+            printf("%s %d\n", listNode->isFinal->word, PlSum(listNode->isFinal));
+        }
+        TrieDf(listNode->children);
+    }
+} 
+
 
 int main ( void ) {
 
@@ -93,7 +107,7 @@ int main ( void ) {
     TrieCreate(&trie);
 
     char word1[] = "world";
-    char word2[] = "war";
+    char word2[] = "argh";
     char word3[] = "two";
     char word4[] = "what";
     char word5[] = "whale";
@@ -111,8 +125,17 @@ int main ( void ) {
     TrieInsert(trie,word2,3);
     TrieInsert(trie,word2,3);
     TrieInsert(trie,word2,3);
+    TrieInsert(trie,word3,1);
+    TrieInsert(trie,word3,2);
+    TrieInsert(trie,word4,1);
+    TrieInsert(trie,word4,1);
+    TrieInsert(trie,word8,0);
 
-
+    char buffer[50];
+    TrieDf(trie->children);
+    // printf("%d %s %d\n", 0, word1, TrieTf(trie,word1,0));
+    // printf("%d %s %d\n", 0, word2, TrieTf(trie,word2,0));
+    // printf("%d %s %d\n", 3, word2, TrieTf(trie,word2,3));
 
     // TriePrint(trie->children);
 

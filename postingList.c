@@ -2,11 +2,13 @@
 
 
 
-void PlCreate( PostingList ** postingList ) {
+void PlCreate( PostingList ** postingList, char * w ) {
 
     (*postingList) = malloc(sizeof(PostingList));
     (*postingList)->length = 0;
     (*postingList)->head = NULL;
+    (*postingList)->word = w;
+    
 }
 
 void PlDestroy( PostingList * postingList ) {
@@ -72,6 +74,23 @@ void PlPrint( PostingList * postingList ) {
         currentPosting = currentPosting->next;
     }
     printf("\n");
+
+}
+
+int PlSum( PostingList * postingList ) {
+
+    if ( postingList == NULL ) {
+        return -1;
+    }
+
+    int sum = 0;
+    Posting * currentPosting;
+    currentPosting = postingList->head;
+    while ( currentPosting != NULL ) {
+        sum += currentPosting->count;
+        currentPosting = currentPosting->next;
+    }
+    return sum;
 
 }
 
