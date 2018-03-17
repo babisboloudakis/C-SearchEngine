@@ -1,7 +1,7 @@
 // Linked list data structure
 // used to store children of a node
 // in a Trie date structure
-#include "postingList.h"
+#include "./postingList.h"
 
 typedef struct List List;
 

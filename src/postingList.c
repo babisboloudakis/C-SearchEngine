@@ -1,4 +1,4 @@
-#include "postingList.h"
+#include "../headers/postingList.h"
 
 
 
@@ -6,8 +6,10 @@ void PlCreate( PostingList ** postingList, char * w ) {
 
     (*postingList) = malloc(sizeof(PostingList));
     (*postingList)->length = 0;
+    (*postingList)->count = 0;
     (*postingList)->head = NULL;
-    (*postingList)->word = w;
+    (*postingList)->word = malloc( sizeof(char) * strlen(w) );
+    strcpy((*postingList)->word,w);
     
 }
 
@@ -22,6 +24,7 @@ void PlDestroy( PostingList * postingList ) {
         free(currentPosting);
     }
 
+    free(postingList->word);
     free(postingList);
 
 }
@@ -44,6 +47,7 @@ void PlInsert( PostingList * postingList, int d) {
         }
         postingList->length++;
     }
+    postingList->count++;
 
 }
 
@@ -82,15 +86,21 @@ int PlSum( PostingList * postingList ) {
     if ( postingList == NULL ) {
         return -1;
     }
+    return postingList->count;
 
-    int sum = 0;
-    Posting * currentPosting;
-    currentPosting = postingList->head;
-    while ( currentPosting != NULL ) {
-        sum += currentPosting->count;
-        currentPosting = currentPosting->next;
+}
+
+Posting * PlGetPosting( PostingList * postingList, int index ) {
+
+    if ( postingList->length == 0 ) {
+        return NULL;
     }
-    return sum;
+
+    Posting * posting = postingList->head;
+    for ( int i = 0; i < index; i++ ) {
+        posting = posting->next;
+    }
+    return posting;
 
 }
 

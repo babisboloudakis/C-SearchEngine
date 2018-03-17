@@ -11,6 +11,7 @@ typedef struct Posting {
 
 typedef struct PostingList {
     int length;
+    int count;
     Posting * head;
     char * word;
 } PostingList;
@@ -21,3 +22,4 @@ void PlInsert( PostingList * , int);
 Posting * PlSearch( PostingList * , int);
 int PlSum( PostingList * );
 void PlPrint( PostingList * );
+Posting * PlGetPosting( PostingList * , int );

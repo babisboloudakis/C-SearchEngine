@@ -1,4 +1,4 @@
-#include "trie.h"
+#include "../headers/trie.h"
 
 int TrieCreate( Trie ** trie ) {
 
@@ -12,16 +12,21 @@ int TrieDestroy( Trie * trie ) {
 
     // Destroy tree
     
-    free(trie);
     TrieHatch(trie->children);
+    free(trie);
     return 0;
 
 }
 
 void TrieHatch( List * list ) {
     // if ( list->length != 0 ) ListPrint(list);
+    ListNode * node;
     for ( int i = 0; i < list->length; i++ ) {
-        TrieHatch( ListGet(list,i)->children );
+        node = ListGet(list,i);
+        if ( node->isFinal != NULL ) {
+            PlDestroy(node->isFinal);
+        }
+        TrieHatch( node->children );
     }
     ListDestroy( list );
 }
@@ -33,7 +38,6 @@ int TrieInsert( Trie * trie, char * word, int d ) {
 
     char letter;
     int length = strlen(word);
-
     for ( int i = 0; i < length; i++ ) {
         letter = word[i];
         if ( ListSearch(currentList,letter) == -1 ) {
@@ -84,64 +88,71 @@ int TrieTf(Trie * trie, char * word, int id ) {
 
     ListNode * node = TrieSearchWord(trie,word);
     Posting * posting = PlSearch(node->isFinal, id);
+    if ( posting == NULL ) return -1;
     return posting->count;
 
 }
 
-void TrieDf( List * list ) {
+void TrieDf( List * list, char * filter ) {
     ListNode * listNode;
     for ( int i = 0; i < list->length; i++ ) {
         
         listNode = ListGet(list,i);
         if ( listNode->isFinal != NULL ) {
-            printf("%s %d\n", listNode->isFinal->word, PlSum(listNode->isFinal));
+            if ( filter == NULL ) {
+                printf("%s %d\n", listNode->isFinal->word, PlSum(listNode->isFinal));
+            } else {
+                if ( strcmp(filter,listNode->isFinal->word) == 0 ) {
+                    printf("%s %d\n", listNode->isFinal->word, PlSum(listNode->isFinal));
+                }
+            }
         }
-        TrieDf(listNode->children);
+        TrieDf(listNode->children,filter);
     }
 } 
 
 
-int main ( void ) {
+// int main ( void ) {
 
-    Trie * trie;
-    TrieCreate(&trie);
+//     Trie * trie;
+//     TrieCreate(&trie);
 
-    char word1[] = "world";
-    char word2[] = "argh";
-    char word3[] = "two";
-    char word4[] = "what";
-    char word5[] = "whale";
-    char word6[] = "three";
-    char word7[] = "race";
-    char word8[] = "grace";
+//     char word1[] = "world";
+//     char word2[] = "argh";
+//     char word3[] = "two";
+//     char word4[] = "what";
+//     char word5[] = "whale";
+//     char word6[] = "three";
+//     char word7[] = "race";
+//     char word8[] = "grace";
 
-    TrieInsert(trie,word1,0);
-    TrieInsert(trie,word1,2);
-    TrieInsert(trie,word1,0);
-    TrieInsert(trie,word1,1);
-    TrieInsert(trie,word1,0);
-    TrieInsert(trie,word1,3);
-    TrieInsert(trie,word2,0);
-    TrieInsert(trie,word2,3);
-    TrieInsert(trie,word2,3);
-    TrieInsert(trie,word2,3);
-    TrieInsert(trie,word3,1);
-    TrieInsert(trie,word3,2);
-    TrieInsert(trie,word4,1);
-    TrieInsert(trie,word4,1);
-    TrieInsert(trie,word8,0);
+//     TrieInsert(trie,word1,0);
+//     TrieInsert(trie,word1,2);
+//     TrieInsert(trie,word1,0);
+//     TrieInsert(trie,word1,1);
+//     TrieInsert(trie,word1,0);
+//     TrieInsert(trie,word1,3);
+//     TrieInsert(trie,word2,0);
+//     TrieInsert(trie,word2,3);
+//     TrieInsert(trie,word2,3);
+//     TrieInsert(trie,word2,3);
+//     TrieInsert(trie,word3,1);
+//     TrieInsert(trie,word3,2);
+//     TrieInsert(trie,word4,1);
+//     TrieInsert(trie,word4,1);
+//     TrieInsert(trie,word8,0);
 
-    char buffer[50];
-    TrieDf(trie->children);
-    // printf("%d %s %d\n", 0, word1, TrieTf(trie,word1,0));
-    // printf("%d %s %d\n", 0, word2, TrieTf(trie,word2,0));
-    // printf("%d %s %d\n", 3, word2, TrieTf(trie,word2,3));
+//     char buffer[50];
+//     TrieDf(trie->children);
+//     // printf("%d %s %d\n", 0, word1, TrieTf(trie,word1,0));
+//     // printf("%d %s %d\n", 0, word2, TrieTf(trie,word2,0));
+//     // printf("%d %s %d\n", 3, word2, TrieTf(trie,word2,3));
 
-    // TriePrint(trie->children);
+//     // TriePrint(trie->children);
 
-    // TrieSearchWord(trie, word3);
-    // TrieSearchWord(trie, word4);
-    // TrieSearchWord(trie, word8);
+//     // TrieSearchWord(trie, word3);
+//     // TrieSearchWord(trie, word4);
+//     // TrieSearchWord(trie, word8);
 
-    // TrieDestroy(trie);
-}
+//     // TrieDestroy(trie);
+// }
