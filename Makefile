@@ -19,3 +19,6 @@ wordList.o: ./src/wordList.c
 
 heap.o: ./src/heap.c 
 	gcc -c ./src/heap.c
+
+clean: 
+	rm -f *.o main

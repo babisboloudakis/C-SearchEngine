@@ -52,7 +52,6 @@ int TrieInsert( Trie * trie, char * word, int d ) {
         PlCreate(&(node->isFinal), word);
     }
     PlInsert(node->isFinal,d);
-    PlPrint(node->isFinal);
     return 0;
 
 } 

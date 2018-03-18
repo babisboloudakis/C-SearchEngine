@@ -7,7 +7,7 @@
 #include "../headers/heap.h"
 
 #define DELIMS " \n\t"
-#define BUFFERSIZE 512
+#define BUFFERSIZE 50000
 #define SCOREB 0.75
 #define SCOREK 1.2
 
@@ -177,7 +177,7 @@ int main ( int argc, char * argv[] ) {
 	while( fgets(buffer,BUFFERSIZE,fp2) != NULL ) {
 		maxLines++;
 		if ( atoi(buffer) != expectedId++ ) {
-			printf("Invalid input file: text ids not in order\n");
+			printf("Invalid input file: text ids not in order \n");
 			printf("Expected %d, got %d\n", --expectedId, atoi(buffer));
 			return -2;
 		}

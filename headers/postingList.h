@@ -2,19 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Posting {
+// Posting node used in PostingLists
+typedef struct Posting { 
     int id;
     int count;
     struct Posting * next;
 } Posting;
 
-
+// Posting list is a list of tupples(id,count)
+// for a specific word.
 typedef struct PostingList {
     int length;
     int count;
     Posting * head;
     char * word;
 } PostingList;
+
 
 void PlCreate( PostingList **, char * );
 void PlDestroy( PostingList *);

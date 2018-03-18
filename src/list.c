@@ -1,6 +1,5 @@
 #include "../headers/list.h"
 
-
 void ListCreate(List ** list) {
     // Used to properly initialize a List
     (*list) = malloc( sizeof(List) );
@@ -9,10 +8,8 @@ void ListCreate(List ** list) {
 
 }
 
-
 void ListDestroy(List * list) {
     // Used to properly free every node of a given List
-
     ListNode * currentNode = NULL;
     while ( list->length ) {
 
@@ -27,7 +24,6 @@ void ListDestroy(List * list) {
     free(list);
 
 }
-
 
 int ListInsert(List * list, char d ) {
 
@@ -68,7 +64,6 @@ int ListInsert(List * list, char d ) {
 
     return 0;
 
-
 }
 
 
@@ -107,7 +102,9 @@ void ListPrint(List * list) {
     printf("\n");
 }
 
+
 ListNode * ListGet( List * list, int index ) {
+    // Used to return a specific node of a given list
     if ( list->length == 0 ) {
         return NULL;
     }
@@ -118,36 +115,3 @@ ListNode * ListGet( List * list, int index ) {
     }
     return currentNode;
 }
-
-// int main ( void ) {
-
-//     List * list;
-//     ListNode * listNode;
-//     ListCreate(&list);
-
-//     ListInsert(list,'a');
-//     ListInsert(list,'e');
-//     ListInsert(list,'b');
-//     ListInsert(list,'c');
-//     ListInsert(list,'z');
-//     ListInsert(list,'f');
-//     ListInsert(list,'y');
-//     ListInsert(list,'a');
-//     ListInsert(list,'z');
-//     ListInsert(list,'d');
-
-//     listNode = ListGet(list,5);
-//     printf("LIST NODE value %c\n", listNode->data);
-//     printf("Searching for \'z\'....\n");
-//     printf("Found in position %d\n", ListSearch(list,'z'));
-
-//     printf("Searching for \'a\'....\n");
-//     printf("Found in position %d\n", ListSearch(list,'a'));
-
-
-//     ListPrint(list);
-
-//     ListDestroy(list);
-
-
-// }

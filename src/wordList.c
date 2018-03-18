@@ -1,6 +1,7 @@
 #include "../headers/wordList.h"
 
 void WordListCreate(WordList ** wordList ) {
+    // Used to initialize a WordList
 
     (*wordList) = malloc( sizeof(WordList) );
     (*wordList)->length = 0;
@@ -9,7 +10,8 @@ void WordListCreate(WordList ** wordList ) {
 }
 
 void WordListDestroy(WordList * wordList ) {
-
+    // Used to free our WordList including 
+    // its nodes and its strings
 
     WordNode * node = NULL;
     while ( wordList->length ) {
@@ -17,7 +19,7 @@ void WordListDestroy(WordList * wordList ) {
         node = wordList->head;
         wordList->head = wordList->head->next;
         wordList->length--;
-
+        free(node->word);
         free(node);
 
     }
@@ -27,6 +29,8 @@ void WordListDestroy(WordList * wordList ) {
 }
 
 int WordListSearch(WordList * wordList , char * word ) {
+    // Searches through the WordList, return position
+    // if found, -1 otherwise
 
     if ( wordList->length == 0 ) {
         return -1;
@@ -44,10 +48,14 @@ int WordListSearch(WordList * wordList , char * word ) {
 }
 
 int WordListInsert( WordList * wordList, char * w) {
+    // Used to insert a string in our WordList
+    // string is stored in heap
 
     WordNode * wordNode;
     wordNode = malloc(sizeof(WordNode));
-    wordNode->word = w;
+    wordNode->word = malloc( sizeof(char) * strlen(w) + 1);
+    strcpy(wordNode->word, w);
+
     if ( wordList->length == 0 ) {
         wordList->head = wordNode;
     } else {
@@ -60,11 +68,12 @@ int WordListInsert( WordList * wordList, char * w) {
 }
 
 void WordListPrint( WordList * wordList ) {
+    // Prints out the WordList, used
+    // for debugging reassons
 
     if ( wordList->length == 0 ) {
         printf("List is empty...\n");
     }
-    printf(" +----------- Our list is -----------+ \n");
     WordNode * currentNode = wordList->head;
     for ( int i = 0; i < wordList->length; i++ ) {
         printf("%s    |", currentNode->word );
@@ -75,6 +84,8 @@ void WordListPrint( WordList * wordList ) {
 }
 
 char * WordListGetWord( WordList * wordList, int index ) {
+    // Used to get a specific word of the list specified
+    // with an index
 
     if ( wordList->length == 0 ) {
         return NULL;
@@ -87,42 +98,3 @@ char * WordListGetWord( WordList * wordList, int index ) {
     return node->word;
 
 }
-
-
-// int main ( void ) {
-
-//     WordList * wordList;
-//     WordListCreate(&wordList);
-
-//     char word1[] = "Hello";
-//     char word2[] = "Fox";
-//     char word3[] = "Lazy";
-//     char word4[] = "Cpp";
-//     char word5[] = "search";
-//     char word6[] = "/df";
-
-//     WordListInsert(wordList,word1);
-//     WordListInsert(wordList,word2);
-//     WordListInsert(wordList,word3);
-//     WordListInsert(wordList,word6);
-//     WordListInsert(wordList,word5);
-
-//     printf("Searching for word \"%s\"...\n", word2);
-//     if ( WordListSearch(wordList,word2) != -1 ) {
-//         printf("Word found!\n");
-//     } else {
-//         printf("Word not found\n");
-//     }
-//     printf("Searching for word \"%s\"...\n", word5);
-//     if ( WordListSearch(wordList,word5) != -1 ) {
-//         printf("Word found!\n");
-//     } else {
-//         printf("Word not found\n");
-//     }
-
-
-//     WordListPrint(wordList);
-
-//     WordListDestroy(wordList);
-
-// }

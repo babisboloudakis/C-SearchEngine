@@ -1,18 +1,19 @@
-// Linked list data structure
-// used to store children of a node
-// in a Trie date structure
 #include "./postingList.h"
 
 typedef struct List List;
 
-typedef struct ListNode {
+// List node contains data (char), a posting list pointer
+// as well as its children
+typedef struct ListNode { 
     struct ListNode * next;
     char data; 
     PostingList * isFinal;
     List * children;
 } ListNode;
 
-struct List {
+// Linked list in ascending order used in trie to connect
+// sibling nodes
+struct List { 
     int length;
     ListNode * head;
 };

@@ -1,19 +1,22 @@
 #include "../headers/postingList.h"
 
 
-
 void PlCreate( PostingList ** postingList, char * w ) {
+    // Used to create a posting list, also saves
+    // the full word for use later
 
     (*postingList) = malloc(sizeof(PostingList));
     (*postingList)->length = 0;
     (*postingList)->count = 0;
     (*postingList)->head = NULL;
-    (*postingList)->word = malloc( sizeof(char) * strlen(w) );
+    (*postingList)->word = malloc( sizeof(char) * strlen(w) + 1);
     strcpy((*postingList)->word,w);
     
 }
 
 void PlDestroy( PostingList * postingList ) {
+    // Used to destroy the posting list and
+    // all its contents
 
     Posting * currentPosting = NULL;
     while ( postingList->length ) {
@@ -30,6 +33,9 @@ void PlDestroy( PostingList * postingList ) {
 }
 
 void PlInsert( PostingList * postingList, int d) {
+    // Used to Insert an id in the posting list
+    // if id already in, then just increase its
+    // count accordingly
 
     Posting * posting;
     if ( (posting = PlSearch(postingList,d) ) != NULL ) {
@@ -52,10 +58,12 @@ void PlInsert( PostingList * postingList, int d) {
 }
 
 Posting * PlSearch( PostingList * postingList, int d ) {
+    // Searches a posting list for a specific id, returns
+    // the found Posting or NULL if not found
+
     if ( postingList->length == 0 ) {
         return NULL;
     }
-
     Posting * currentPosting = postingList->head;
     for ( int i = 0; i < postingList->length; i++ ) {
         if ( currentPosting->id == d ) {
@@ -67,11 +75,12 @@ Posting * PlSearch( PostingList * postingList, int d ) {
 }
 
 void PlPrint( PostingList * postingList ) {
+    // Prints out the posting list in stdout
+    // Used for debugging reassons
 
     if ( postingList->length == 0 ) {
         printf("List is empty...\n");
     }
-    printf(" +----------- Our Posting list is -----------+ \n");
     Posting * currentPosting = postingList->head;
     for ( int i = 0; i < postingList->length; i++ ) {
         printf("%5d,%d    |", currentPosting->id, currentPosting->count );
@@ -82,6 +91,8 @@ void PlPrint( PostingList * postingList ) {
 }
 
 int PlSum( PostingList * postingList ) {
+    // Return the total occurances of a word in our
+    // text or -1 if not found, used in /df
 
     if ( postingList == NULL ) {
         return -1;
@@ -91,11 +102,11 @@ int PlSum( PostingList * postingList ) {
 }
 
 Posting * PlGetPosting( PostingList * postingList, int index ) {
+    // Returns a specific posting we specified with index
 
     if ( postingList->length == 0 ) {
         return NULL;
     }
-
     Posting * posting = postingList->head;
     for ( int i = 0; i < index; i++ ) {
         posting = posting->next;
@@ -103,32 +114,3 @@ Posting * PlGetPosting( PostingList * postingList, int index ) {
     return posting;
 
 }
-
-
-// int main ( void ) { 
-
-//     PostingList * postingList;
-
-//     PlCreate(&postingList);
-
-//     PlInsert(postingList, 0);
-//     PlInsert(postingList, 0);
-//     PlInsert(postingList, 1);
-//     PlInsert(postingList, 2);
-//     PlInsert(postingList, 2);
-//     PlInsert(postingList, 2);
-//     PlInsert(postingList, 2);
-//     PlInsert(postingList, 3);
-//     PlInsert(postingList, 5);
-//     PlInsert(postingList, 20);
-//     PlInsert(postingList, 20);
-//     PlInsert(postingList, 20);
-
-//     PlPrint(postingList);
-
-
-//     PlDestroy(postingList);
-
-
-
-// }
