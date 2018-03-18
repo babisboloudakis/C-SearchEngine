@@ -22,8 +22,9 @@ int HeapParent(int );
 void HeapSwap(Heap *,int, int);
 
 void HeapInsert(Heap *, int , double );
-double HeapTop(Heap *);
+Result * HeapTop(Heap *);
 void HeapPrint(Heap *);
 
-void HeapBubbleUp(Heap *);
-void HeapBubbleDown(Heap *);
+int HeapSearch(Heap *, int );
+void HeapBuild(Heap *);
+void HeapHeapify(Heap *,int);

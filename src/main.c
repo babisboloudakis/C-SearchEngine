@@ -4,6 +4,7 @@
 #include <math.h>
 #include "../headers/trie.h"
 #include "../headers/wordList.h"
+#include "../headers/heap.h"
 
 #define DELIMS " \n\t"
 #define BUFFERSIZE 512
@@ -13,14 +14,22 @@
 char ** textMap;
 int * documentWordCount;
 Trie * trie;
+Heap * heap;
 int maxLines = 0;
 int averageWords = 0;
+
 
 
 void searchQuery(WordList * wordList ) {
 
 	double documentScore = 0;
-
+	int documentsInQuery = 0;
+	for ( int i = 0; i < wordList->length; i++) {
+		ListNode * listNode = TrieSearchWord(trie,WordListGetWord(wordList,i));
+		if ( listNode == NULL ) continue;
+		documentsInQuery += listNode->isFinal->count;
+	}
+	HeapCreate(&heap,documentsInQuery);
 
 	//Calculate score
 	double numerator = 0;
@@ -35,18 +44,55 @@ void searchQuery(WordList * wordList ) {
 		for ( int j = 0; j < listNode->isFinal->length; j++ ) {
 			posting = PlGetPosting(listNode->isFinal,j);
 			f = posting->count;
-			idf = log(	(maxLines - listNode->isFinal->length + 0.5) / (listNode->isFinal->length + 0.5)	);
+			idf = log10(	(maxLines - listNode->isFinal->length + 0.5) / (listNode->isFinal->length + 0.5)	);
 			numerator = f * (SCOREK + 1) * idf;
 			denominator = f + SCOREK * ( 1 - SCOREB + SCOREB * documentWordCount[posting->id] / averageWords);
+
+			HeapInsert(heap,posting->id,numerator/denominator);
 		}
 		
-		documentScore += numerator / denominator;
 
 	}
 
+	Result * result;
+	char * underline;
+	int strSize = 0;
+	char buffer[BUFFERSIZE];
+	char * temp;
+	while( heap->length ) {
+		result = HeapTop(heap);
+	    printf("(%5d)[%.4f] %s\n", result->id, result->score, textMap[result->id]);
+		strSize = 15 + strlen(textMap[result->id]);
+		underline = malloc( strSize );
+		for ( int i = 0; i < strSize; i++ ) {
+			underline[i] = ' ';
+		}
 
-	printf("documentScore is %f\n", documentScore);
+		// fgets(buffer,BUFFERSIZE,textMap[result->id]);
+		int offset = 18;
+		temp = strtok(textMap[result->id],DELIMS);
+		if ( WordListSearch(wordList,temp) >= 0 ) {
+			for ( int i = offset; i < offset + strlen(temp); i++ ) {
+				underline[i] = '^';
+			}
+		}
+		offset += strlen(temp);
+		while ( temp != NULL ) {
+			temp = strtok(NULL,DELIMS);
+			if ( temp == NULL ) break;
+			if ( WordListSearch(wordList,temp) >= 0 ) {
+				for ( int i = offset; i < offset + strlen(temp); i++ ) {
+					underline[i] = '^';
+				}
+			}
+			offset += strlen(temp);
+		}
+		printf("%s\n", underline);
 
+		free(result);
+	}
+
+	HeapDestroy(heap);
 
 
 }
@@ -98,6 +144,11 @@ void userLoop() { // User interface for commands on search engine
 			} else {
 				printf("%d %s %d\n",id, word, TrieTf(trie,word,id));
 			}
+		} else {
+			printf("Unknown command, available commands are: \n");
+			printf("/search arg1 arg2 ... arg10\n");
+			printf("/df (filter)\n");
+			printf("/tf id word\n");
 		}
 		WordListDestroy(parameters);
 	}
@@ -121,12 +172,13 @@ int main ( int argc, char * argv[] ) {
 
 	char buffer[BUFFERSIZE];
 
-	//	Calculate number of lines
+		// Calculate number of lines
 	int expectedId = 0;
 	while( fgets(buffer,BUFFERSIZE,fp2) != NULL ) {
 		maxLines++;
 		if ( atoi(buffer) != expectedId++ ) {
 			printf("Invalid input file: text ids not in order\n");
+			printf("Expected %d, got %d\n", --expectedId, atoi(buffer));
 			return -2;
 		}
 	} 

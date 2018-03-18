@@ -1,5 +1,5 @@
-0 And we were bold
-1 Over the world
+0   And we were bold
+1    Over the world
 2 We were flying through the satellites
 3 We had ahold
 4 Of the lightning strikes
