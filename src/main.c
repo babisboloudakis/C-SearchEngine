@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 #include "../headers/trie.h"
 #include "../headers/wordList.h"
 #include "../headers/heap.h"
@@ -11,20 +13,34 @@
 #define SCOREB 0.75
 #define SCOREK 1.2
 
+//	global variables used for our data structures 
 char ** textMap;
 int * documentWordCount;
 Trie * trie;
 Heap * heap;
+
+//	global variables used in score
 int maxLines = 0;
 int averageWords = 0;
 
-double CalculateScore(WordList * wordList) {
+//	global variables used to restrict results
+int K = 10;
+int loops = 0;
+
+//	used to get terminal width
+struct winsize w;
+
+
+void CalculateScore(WordList * wordList) {
+	// Calculate the score of a query and updates the
+	// heap accordingly
 
 	double documentScore = 0;
 	double numerator = 0;
 	double idf = 0;
 	double denominator = 0;
-	for ( int i = 0; i < wordList->length; i++ ) {
+	int max = 10;
+	for ( int i = 0; i < wordList->length && i < max; i++ ) {
 
 		ListNode * listNode = TrieSearchWord(trie,WordListGetWord(wordList,i));
 		if ( listNode == NULL ) continue;
@@ -39,33 +55,23 @@ double CalculateScore(WordList * wordList) {
 			documentScore = numerator/denominator;
 			HeapInsert(heap,posting->id, documentScore);
 		}
-		
-
 	}
-
-	return documentScore;
 
 }
 
 void searchQuery(WordList * wordList ) {
 
-	// int documentsInQuery = 0;
-	// for ( int i = 0; i < wordList->length; i++) {
-	// 	ListNode * listNode = TrieSearchWord(trie,WordListGetWord(wordList,i));
-	// 	if ( listNode == NULL ) continue;
-	// 	documentsInQuery += listNode->isFinal->count;
-	// }
 	HeapCreate(&heap,maxLines);
 
 	//Calculate score
-	double score = CalculateScore(wordList);
+	CalculateScore(wordList);
 
 	Result * result;
 	char * underline;
 	int strSize = 0;
 	char buffer[BUFFERSIZE];
 	char * temp, * temp2;
-	while( ( result = HeapTop(heap) ) != NULL ) {
+	while( ( result = HeapTop(heap) ) != NULL && loops++ < K ) {
 		// Get top result and find every word in it
 
 		// Create a clone of the top document
@@ -89,19 +95,25 @@ void searchQuery(WordList * wordList ) {
 
 				}
 		}
-		// for ( int i = 0; i < strlen(temp); i++ ) {
-		// 	if ( underline[i] == '\n' ) break;
-		// 	putchar(temp[i]);
-		// }
-		// putchar('\n');
-		// for ( int i = 0; i < strlen(underline); i++ ) {
-		// 	if ( underline[i] == '\n' ) break;
-		// 	putchar(underline[i]);
-		// }
-		// 		putchar('\n');
-		printf("%f\n", score);
-		printf("%s\n", temp);
-		printf("%s\n", underline);
+
+
+		printf("( %5d)[%.5f]\n", result->id, result->score);
+
+		int offset = 0;
+		int offset2 = 0;
+		while ( offset < strlen(temp) ) {
+			for ( int i = 0; i < w.ws_col && offset < strlen(temp); i++ ) {
+				putchar(temp[offset]);
+				offset++;
+			}
+			putchar('\n');
+			for ( int i = 0; i < w.ws_col && offset2 < strlen(underline); i++ ) {
+				putchar(underline[offset2]);
+				offset2++;
+			}
+			putchar('\n');
+		}
+		
 
 		free(underline);
 		free(result);
@@ -125,6 +137,13 @@ void userLoop() {
 
 		WordListCreate(&parameters);
 		fgets(buffer,BUFFERSIZE,stdin); //	Read command
+		if ( *buffer == '\n' || *buffer == ' ' || *buffer == '\t' ) {
+			printf("Unknown command, available commands are: \n");
+			printf("/search arg1 arg2 ... arg10\n");
+			printf("/df (filter)\n");
+			printf("/tf id word\n");
+			continue;
+		}
 		command = strtok(buffer," \n\t");
 
 		//	Read parameters
@@ -144,10 +163,12 @@ void userLoop() {
 			if ( parameters->length == 0 ) {
 				printf("Wrong format: /search arg1 arg2 ... arg10\n");
 			} else {
+				loops = 0;
 				searchQuery(parameters);
 			}
 		} else if ( strcmp(command,"/df") == 0 ) {
 			if ( parameters->length == 0 ) {
+				loops = 0;
 				TrieDf(trie->children,NULL);
 			} else {
 				TrieDf(trie->children,WordListGetWord(parameters,parameters->length-1));
@@ -183,6 +204,11 @@ int main ( int argc, char * argv[] ) {
 		printf("/main -i \"input file\" (-k K)\n");
 		return -1;
 	}
+	if ( argc >= 5 ) {
+		K = atoi(argv[4]);
+	}
+
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 	FILE * fp1, *fp2;
 
@@ -228,11 +254,6 @@ int main ( int argc, char * argv[] ) {
 		}
 	}
 	averageWords /= maxLines;
-
-	// Map print
-	// for ( int i = 0; i < maxLines; i++ ) {
-	// 	printf("Line %s \n", textMap[i]);
-	// }
 
 	//	Entering user-mode
 	printf("Done!\n");

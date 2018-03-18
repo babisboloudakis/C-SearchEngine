@@ -1,5 +1,8 @@
 #include "../headers/trie.h"
 
+extern int K;
+extern int loops;
+
 int TrieCreate( Trie ** trie ) {
     // Used to create and initialize a trie
 
@@ -114,14 +117,17 @@ void TrieDf( List * list, char * filter ) {
     // Used in the /df command, does the printing
     // itself, also has parameter filter which ignored
     // if NULL, else prints only the given word.
-
     ListNode * listNode;
     for ( int i = 0; i < list->length; i++ ) {
         
         listNode = ListGet(list,i);
         if ( listNode->isFinal != NULL ) {
             if ( filter == NULL ) {
+                if ( ++loops > K ) {
+                 break;   
+                }
                 printf("%s %d\n", listNode->isFinal->word, listNode->isFinal->length);
+                
             } else {
                 if ( strcmp(filter,listNode->isFinal->word) == 0 ) {
                     printf("%s %d\n", listNode->isFinal->word, listNode->isFinal->length);
