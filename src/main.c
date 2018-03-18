@@ -18,20 +18,9 @@ Heap * heap;
 int maxLines = 0;
 int averageWords = 0;
 
-
-
-void searchQuery(WordList * wordList ) {
+double CalculateScore(WordList * wordList) {
 
 	double documentScore = 0;
-	int documentsInQuery = 0;
-	for ( int i = 0; i < wordList->length; i++) {
-		ListNode * listNode = TrieSearchWord(trie,WordListGetWord(wordList,i));
-		if ( listNode == NULL ) continue;
-		documentsInQuery += listNode->isFinal->count;
-	}
-	HeapCreate(&heap,documentsInQuery);
-
-	//Calculate score
 	double numerator = 0;
 	double idf = 0;
 	double denominator = 0;
@@ -47,48 +36,74 @@ void searchQuery(WordList * wordList ) {
 			idf = log10(	(maxLines - listNode->isFinal->length + 0.5) / (listNode->isFinal->length + 0.5)	);
 			numerator = f * (SCOREK + 1) * idf;
 			denominator = f + SCOREK * ( 1 - SCOREB + SCOREB * documentWordCount[posting->id] / averageWords);
-
-			HeapInsert(heap,posting->id,numerator/denominator);
+			documentScore = numerator/denominator;
+			HeapInsert(heap,posting->id, documentScore);
 		}
 		
 
 	}
 
+	return documentScore;
+
+}
+
+void searchQuery(WordList * wordList ) {
+
+	// int documentsInQuery = 0;
+	// for ( int i = 0; i < wordList->length; i++) {
+	// 	ListNode * listNode = TrieSearchWord(trie,WordListGetWord(wordList,i));
+	// 	if ( listNode == NULL ) continue;
+	// 	documentsInQuery += listNode->isFinal->count;
+	// }
+	HeapCreate(&heap,maxLines);
+
+	//Calculate score
+	double score = CalculateScore(wordList);
+
 	Result * result;
 	char * underline;
 	int strSize = 0;
 	char buffer[BUFFERSIZE];
-	char * temp;
-	while( heap->length ) {
-		result = HeapTop(heap);
-	    printf("(%5d)[%.4f] %s\n", result->id, result->score, textMap[result->id]);
-		strSize = 15 + strlen(textMap[result->id]);
-		underline = malloc( strSize );
-		for ( int i = 0; i < strSize; i++ ) {
-			underline[i] = ' ';
-		}
+	char * temp, * temp2;
+	while( ( result = HeapTop(heap) ) != NULL ) {
+		// Get top result and find every word in it
 
-		// fgets(buffer,BUFFERSIZE,textMap[result->id]);
-		int offset = 18;
-		temp = strtok(textMap[result->id],DELIMS);
-		if ( WordListSearch(wordList,temp) >= 0 ) {
-			for ( int i = offset; i < offset + strlen(temp); i++ ) {
-				underline[i] = '^';
-			}
-		}
-		offset += strlen(temp);
-		while ( temp != NULL ) {
-			temp = strtok(NULL,DELIMS);
-			if ( temp == NULL ) break;
-			if ( WordListSearch(wordList,temp) >= 0 ) {
-				for ( int i = offset; i < offset + strlen(temp); i++ ) {
-					underline[i] = '^';
+		// Create a clone of the top document
+		temp = textMap[result->id];
+		underline = malloc( sizeof(char) * ( strlen(temp) + 1 ) );
+		strcpy(underline,temp);
+
+		// Replace every word from arguments found in document clone
+		// with ^
+		for ( int arg = 0; arg < wordList->length; arg++ ) {
+			while ( ( temp2 = strstr(underline, WordListGetWord(wordList,arg)) ) != NULL ) {
+				for ( int i = 0; i < strlen(WordListGetWord(wordList,arg)); i++ ) {
+					temp2[i] = '^';
 				}
 			}
-			offset += strlen(temp);
 		}
+		// Any other stuff replaced with SPACE
+		for ( int i = 0; i < strlen(underline); i++ ) {
+				if ( underline[i] != '^' ) {
+					underline[i] = ' ';
+
+				}
+		}
+		// for ( int i = 0; i < strlen(temp); i++ ) {
+		// 	if ( underline[i] == '\n' ) break;
+		// 	putchar(temp[i]);
+		// }
+		// putchar('\n');
+		// for ( int i = 0; i < strlen(underline); i++ ) {
+		// 	if ( underline[i] == '\n' ) break;
+		// 	putchar(underline[i]);
+		// }
+		// 		putchar('\n');
+		printf("%f\n", score);
+		printf("%s\n", temp);
 		printf("%s\n", underline);
 
+		free(underline);
 		free(result);
 	}
 
@@ -98,18 +113,19 @@ void searchQuery(WordList * wordList ) {
 }
 
 
-void userLoop() { // User interface for commands on search engine
+void userLoop() {
+	 // User interface for commands on search engine
 
-	char buffer[100];
+	char buffer[BUFFERSIZE];
 	char * temp;
 	char * command;
 	WordList * parameters;
 
-	while ( 1 != 0 ) {
+	while ( 1 != 0 ) { // only user can terminate with /exit 
+
 		WordListCreate(&parameters);
-		fgets(buffer,100,stdin); //	Read command
+		fgets(buffer,BUFFERSIZE,stdin); //	Read command
 		command = strtok(buffer," \n\t");
-		// printf("Command is  \" %s \" \n",command);
 
 		//	Read parameters
 		int paramCount = -1;
@@ -118,31 +134,35 @@ void userLoop() { // User interface for commands on search engine
 			temp = strtok(NULL,DELIMS);
 			if ( temp == NULL ) break;
 			WordListInsert(parameters, temp);
-			// printf("just got parameter %s\n", WordListGetWord(parameters,paramCount));
 		} while ( temp != NULL );
-		WordListPrint(parameters);
 		
 		//	Execute appropriate command
 		if ( strcmp(command,"/exit") == 0 ) {
 			WordListDestroy(parameters);
 			break;
 		} else if ( strcmp(command,"/search") == 0 ) {
-
-			searchQuery(parameters);
-
+			if ( parameters->length == 0 ) {
+				printf("Wrong format: /search arg1 arg2 ... arg10\n");
+			} else {
+				searchQuery(parameters);
+			}
 		} else if ( strcmp(command,"/df") == 0 ) {
-			if ( paramCount == 0 ) {
+			if ( parameters->length == 0 ) {
 				TrieDf(trie->children,NULL);
 			} else {
 				TrieDf(trie->children,WordListGetWord(parameters,parameters->length-1));
 			}
 		} else if ( strcmp(command,"/tf") == 0 ) {
-			int id = atoi(WordListGetWord(parameters,parameters->length-1));
-			char * word = WordListGetWord(parameters,parameters->length - 2);
-			if ( TrieTf(trie,word,id) == -1 ) {
-				printf("%d %s not found.\n",id,word);
+			if ( parameters->length != 2 ) {
+				printf("Wrong format:/tf id word\n");
 			} else {
-				printf("%d %s %d\n",id, word, TrieTf(trie,word,id));
+				int id = atoi(WordListGetWord(parameters,parameters->length-1));
+				char * word = WordListGetWord(parameters,parameters->length - 2);
+				if ( TrieTf(trie,word,id) == -1 ) {
+					printf("%d %s not found.\n",id,word);
+				} else {
+					printf("%d %s %d\n",id, word, TrieTf(trie,word,id));
+				}
 			}
 		} else {
 			printf("Unknown command, available commands are: \n");
@@ -152,7 +172,6 @@ void userLoop() { // User interface for commands on search engine
 		}
 		WordListDestroy(parameters);
 	}
-
 
 }
 
@@ -172,7 +191,7 @@ int main ( int argc, char * argv[] ) {
 
 	char buffer[BUFFERSIZE];
 
-		// Calculate number of lines
+	// Calculate number of lines
 	int expectedId = 0;
 	while( fgets(buffer,BUFFERSIZE,fp2) != NULL ) {
 		maxLines++;
@@ -182,27 +201,28 @@ int main ( int argc, char * argv[] ) {
 			return -2;
 		}
 	} 
-	printf("Our line number is %d\n", maxLines);
 	//Allocate number of lines on Map
 	textMap = malloc( sizeof(char*) * maxLines); 
 	documentWordCount = malloc ( sizeof(int) * maxLines);
+	for ( int i = 0; i < maxLines; i++) documentWordCount[i] = 0;
 	TrieCreate(&trie);
 
+	printf("Loading ...\n");
 	char * word;
 	int id;
-	//	Calculate size of lines
+	//	Calculate size of lines and insert on trie and map
 	for ( int currentLine = 0; currentLine < maxLines; currentLine++ ) { 
 		memset(buffer,0,BUFFERSIZE);
 		fgets(buffer,BUFFERSIZE,fp1);
 
 		int tempLen = strlen(buffer);
-		textMap[currentLine] =  malloc( sizeof(char) * tempLen);
+		textMap[currentLine] =  malloc( sizeof(char) * tempLen + 1);
 		strcpy(textMap[currentLine],buffer);
 
 		id = atoi(strtok(buffer,DELIMS));
 		while (  ( word = strtok(NULL,DELIMS) ) != NULL ) {
-			printf("inserting %s into the trie with id %d\n", word, id);
 			TrieInsert(trie,word, id);
+			// used for scoring
 			averageWords++;
 			documentWordCount[currentLine]++;
 		}
@@ -210,17 +230,13 @@ int main ( int argc, char * argv[] ) {
 	averageWords /= maxLines;
 
 	// Map print
-	for ( int i = 0; i < maxLines; i++ ) {
-		printf("Line %s \n", textMap[i]);
-	}
-
-
+	// for ( int i = 0; i < maxLines; i++ ) {
+	// 	printf("Line %s \n", textMap[i]);
+	// }
 
 	//	Entering user-mode
-	printf("Loading done...\n");
+	printf("Done!\n");
 	userLoop();
-
-
 
 	//De-allocs
 	for( int currentLine = 0; currentLine < maxLines; currentLine++) { 

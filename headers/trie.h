@@ -1,21 +1,16 @@
 #include "list.h"
 
-// typedef struct TrieNode { 
-//     void * isFinal;
-//     List children;
-// } TrieNode;
-
+// Trie data structure, used to store
+// the first level of siblings
 typedef struct Trie {
     List * children;
 } Trie;
 
 
-
-
 // Functions on Trie
 int TrieCreate(Trie **);
 int TrieDestroy(Trie *);
-void TrieHatch(List *);
+void TrieCut(List *);
 int TrieTf(Trie *, char *, int);
 void TrieDf(List * , char *);
 int TrieInsert(Trie *, char *, int);

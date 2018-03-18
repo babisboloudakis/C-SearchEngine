@@ -1,6 +1,8 @@
 #include "../headers/heap.h"
 
 void HeapCreate( Heap ** heap, int size ) {
+    // Creates and initializes a heap
+    // of query results
 
     (*heap) = malloc( sizeof(Heap) );
     (*heap)->length = 0;
@@ -8,32 +10,40 @@ void HeapCreate( Heap ** heap, int size ) {
     (*heap)->capacity = size;
 
     for ( int i = 0; i < size; i++ ) {
-        (*heap)->results[i].id = -1;
-        (*heap)->results[i].score = -1; 
+        (*heap)->results[i].id = -1000;
+        (*heap)->results[i].score = -1000; 
     }
 }
 
 void HeapDestroy( Heap * heap) {
+    // Frees heap and its content
+
     free(heap->results);
     free(heap);
 }
 
 int HeapRightChild( int index ) {
+    // Return right child of a given node
+
     return 2 * index + 2;
 }
 
 int HeapLeftChild( int index ) {
+    // Return left child of a given node
+
     return 2 * index + 1;
 }
 
 int HeapParent( int index ) {
+    // Return parent of a given node
+
     return ( index % 2 == 0 ) ? index / 2 - 1 : index / 2;
 }
 
 void HeapSwap( Heap * heap, int index1 , int index2 ) {
+    // Swap the content of 2 given nodes
 
     Result temp;
-
     temp.id = heap->results[index1].id;
     temp.score = heap->results[index1].score;
     heap->results[index1].id = heap->results[index2].id;
@@ -44,10 +54,14 @@ void HeapSwap( Heap * heap, int index1 , int index2 ) {
 }
 
 void HeapInsert( Heap * heap, int d, double s ) {
+    // Inserts an id,score tupple in the heap,
+    // if id already exists then just increases
+    // the score of the already existant node
+
     int index = 0;
     if ( ( index = HeapSearch(heap,d) ) != -1 ) {
         heap->results[index].score += s;
-        } else {
+    } else {
         heap->results[heap->length].id = d; 
         heap->results[heap->length].score = s;
         heap->length++;
@@ -57,17 +71,22 @@ void HeapInsert( Heap * heap, int d, double s ) {
 
 
 void HeapPrint( Heap * heap ) {
+    // Prints out the heap
+    // Used for debugging
+
     for ( int i = 0; i < heap->length; i++ ) {
         printf("   %f , %d   \n", heap->results[i].score, heap->results[i].id );
     } 
 }
 
 void HeapHeapify(Heap * heap, int index ) {
+    // Recursive function used in heapBuild
+
     int largest = index;
-    if ( heap->results[HeapLeftChild(index)].score > heap->results[largest].score && HeapLeftChild(index) < heap->length ) {
+    if ( HeapLeftChild(index) < heap->length && heap->results[HeapLeftChild(index)].score >= heap->results[largest].score  ) {
         largest = HeapLeftChild(index);
     } 
-    if ( heap->results[HeapRightChild(index)].score > heap->results[largest].score && HeapRightChild(index) < heap->length ) {
+    if ( HeapRightChild(index) < heap->length && heap->results[HeapRightChild(index)].score >= heap->results[largest].score  ) {
         largest = HeapRightChild(index);
     } 
     if ( largest != index ) {
@@ -77,13 +96,17 @@ void HeapHeapify(Heap * heap, int index ) {
 }
 
 void HeapBuild(Heap * heap) {
+    // Used to sort our heap
+
     for ( int i = HeapParent(heap->length -1); i >= 0; i-- ) {
         HeapHeapify(heap,i);
     }
 } 
 
 int HeapSearch(Heap * heap, int d ) {
-    for ( int i = 0; i < heap->length -1; i++ ) {
+    // Searches the heap for a given id
+
+    for ( int i = 0; i < heap->length; i++ ) {
         if ( heap->results[i].id == d ) {
             return i;
         }
@@ -93,6 +116,9 @@ int HeapSearch(Heap * heap, int d ) {
 
 Result * HeapTop(Heap * heap ) {
 
+    if ( heap->length == 0 ) {
+        return NULL;
+    }
     HeapBuild(heap);
 
     double sco = heap->results[0].score;
@@ -104,8 +130,8 @@ Result * HeapTop(Heap * heap ) {
 
     heap->results[0].id = heap->results[heap->length-1].id;
     heap->results[0].score = heap->results[heap->length-1].score;
-    heap->results[heap->length-1].id = -1;
-    heap->results[heap->length-1].score = -1;
+    heap->results[heap->length-1].id = -1000;
+    heap->results[heap->length-1].score = -1000;
     heap->length--;
 
     return temp;

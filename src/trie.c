@@ -1,6 +1,7 @@
 #include "../headers/trie.h"
 
 int TrieCreate( Trie ** trie ) {
+    // Used to create and initialize a trie
 
     (*trie) = malloc( sizeof(Trie) );
     ListCreate( &((*trie)->children) );
@@ -9,32 +10,40 @@ int TrieCreate( Trie ** trie ) {
 }
 
 int TrieDestroy( Trie * trie ) { 
-
-    // Destroy tree
+    // Destroy tree and ALL its contents
+    // contents are freed recursively using
+    // trieCut
     
-    TrieHatch(trie->children);
+    TrieCut(trie->children);
     free(trie);
     return 0;
 
 }
 
-void TrieHatch( List * list ) {
-    // if ( list->length != 0 ) ListPrint(list);
+void TrieCut( List * list ) {
+    // Used in TrieDestroy, this function frees
+    // a list in the tree as well as it contents
+    // but before that makes a recursive call
+    // on its children
+
     ListNode * node;
     for ( int i = 0; i < list->length; i++ ) {
         node = ListGet(list,i);
         if ( node->isFinal != NULL ) {
             PlDestroy(node->isFinal);
         }
-        TrieHatch( node->children );
+        TrieCut( node->children );
     }
     ListDestroy( list );
 }
 
 int TrieInsert( Trie * trie, char * word, int d ) {
+    // Inserts a word in the trie, if the word already
+    // exists then it simply increase the counter accordingly
+    // on the right PostingList, else it also creates a Posting
+    // least which it connects on the leaf node
 
     List * currentList = trie->children;
-    // ListNode * currentNode = NULL;
 
     char letter;
     int length = strlen(word);
@@ -57,13 +66,20 @@ int TrieInsert( Trie * trie, char * word, int d ) {
 } 
 
 void TriePrint ( List * list ) {
+    // Used for debugging reassons
+    // WARNING: ugly output format
+
     if ( list->length != 0 ) ListPrint(list);
     for ( int i = 0; i < list->length; i++ ) {
         TriePrint( ListGet(list,i)->children );
     }
 }
 
+
 ListNode * TrieSearchWord ( Trie * trie , char * word ) {
+    // Used to search the trie for a given word, returns
+    // NULL if word not found, if found it returns the leaf
+    // node that also contains the pointer to the postingList
 
     List * currentList = trie->children;
 
@@ -84,6 +100,8 @@ ListNode * TrieSearchWord ( Trie * trie , char * word ) {
 }
 
 int TrieTf(Trie * trie, char * word, int id ) {
+    // Used in /tf command, just returns the count
+    // of a specific word in a specific id
 
     ListNode * node = TrieSearchWord(trie,word);
     Posting * posting = PlSearch(node->isFinal, id);
@@ -93,65 +111,23 @@ int TrieTf(Trie * trie, char * word, int id ) {
 }
 
 void TrieDf( List * list, char * filter ) {
+    // Used in the /df command, does the printing
+    // itself, also has parameter filter which ignored
+    // if NULL, else prints only the given word.
+
     ListNode * listNode;
     for ( int i = 0; i < list->length; i++ ) {
         
         listNode = ListGet(list,i);
         if ( listNode->isFinal != NULL ) {
             if ( filter == NULL ) {
-                printf("%s %d\n", listNode->isFinal->word, PlSum(listNode->isFinal));
+                printf("%s %d\n", listNode->isFinal->word, listNode->isFinal->length);
             } else {
                 if ( strcmp(filter,listNode->isFinal->word) == 0 ) {
-                    printf("%s %d\n", listNode->isFinal->word, PlSum(listNode->isFinal));
+                    printf("%s %d\n", listNode->isFinal->word, listNode->isFinal->length);
                 }
             }
         }
         TrieDf(listNode->children,filter);
     }
 } 
-
-
-// int main ( void ) {
-
-//     Trie * trie;
-//     TrieCreate(&trie);
-
-//     char word1[] = "world";
-//     char word2[] = "argh";
-//     char word3[] = "two";
-//     char word4[] = "what";
-//     char word5[] = "whale";
-//     char word6[] = "three";
-//     char word7[] = "race";
-//     char word8[] = "grace";
-
-//     TrieInsert(trie,word1,0);
-//     TrieInsert(trie,word1,2);
-//     TrieInsert(trie,word1,0);
-//     TrieInsert(trie,word1,1);
-//     TrieInsert(trie,word1,0);
-//     TrieInsert(trie,word1,3);
-//     TrieInsert(trie,word2,0);
-//     TrieInsert(trie,word2,3);
-//     TrieInsert(trie,word2,3);
-//     TrieInsert(trie,word2,3);
-//     TrieInsert(trie,word3,1);
-//     TrieInsert(trie,word3,2);
-//     TrieInsert(trie,word4,1);
-//     TrieInsert(trie,word4,1);
-//     TrieInsert(trie,word8,0);
-
-//     char buffer[50];
-//     TrieDf(trie->children);
-//     // printf("%d %s %d\n", 0, word1, TrieTf(trie,word1,0));
-//     // printf("%d %s %d\n", 0, word2, TrieTf(trie,word2,0));
-//     // printf("%d %s %d\n", 3, word2, TrieTf(trie,word2,3));
-
-//     // TriePrint(trie->children);
-
-//     // TrieSearchWord(trie, word3);
-//     // TrieSearchWord(trie, word4);
-//     // TrieSearchWord(trie, word8);
-
-//     // TrieDestroy(trie);
-// }
