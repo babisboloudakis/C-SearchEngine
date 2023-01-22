@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "list.h": "c",
-        "postinglist.h": "c",
-        "heap.h": "c"
-    }
-}
