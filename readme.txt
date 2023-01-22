@@ -1,32 +1,22 @@
-Xaralampos
-Mpoloudakis
-1115201500103
-
 -------------------------
-
 1.How to run
 2. Description
     2.1. Data structures
     2.2 User interface
 3.Bugs
-
 --------------------------
 
 1. How to run:
-
     To run the program simply use the makefile like this
     $ make
     And then execute
     $ ./main -i inputFile -k K ( k is optional argument, 10 by default )
-
     There is also a make clean command to delete .o files as well as the executable
     $ make clean
 
 
 2. Description:
-
     2.1 Data structures
-
         Map: A dynamically allocated array is used to store the documents from our input
         file. These documents are used in /search command.
 
@@ -44,28 +34,20 @@ Mpoloudakis
         the top (id,score) tupple from the heap, remove it, and make sure it is still a heap by sorting.
 
         WordList: It is a simple linked list of strings. It is used to store the arguments of the  user commands 
-
-
+        
     2.2 User interface
-
         After the program build its data structures from the input file, the program enters an infinite
         loop state that reads and executes user commands.
 
             /search (arguments) to find documents that contain the words in arguments sorted by query score
-
             /df ( filter , optional ) to diplay document frequency vector, use filter argument to look for a 
             specific word 
-
             /tf id word     to display term frequency for a specific word on a specific document
-
             /exit   to quit the program and smoothly free the data structures 
 
 3. Bugs:
-
     -   in /search the printing of the results isn't exactly like the example, however it's correct.
-
     -   there may be some weird inputs in user mode that make program crash which aren't handled, however
     most possible inputs throw errors and 100% of the correct commands run.
-
     -   there may be some search terms that crash the program, however I encountered this only a few times
     in a vast set of queries 
